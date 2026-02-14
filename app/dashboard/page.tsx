@@ -2,18 +2,16 @@
 
 import { ReportCard } from "@/components/ReportCard";
 import { RankingTable } from "@/components/RankingTable";
-import { getClassRanking, getStudentReport } from "@/lib/api-client";
+import {
+  getAvailableTerms,
+  getClassRankingFromSheet,
+  getStudentReportFromSheet,
+} from "@/lib/public-sheet";
 import { clearUser, loadUser } from "@/lib/session";
 import type { RankingStudent, Student, User } from "@/types";
 import { FileText, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-
-const termOptions = [
-  { value: "FirstTerm", label: "First Term" },
-  { value: "SecondTerm", label: "Second Term" },
-  { value: "ThirdTerm", label: "Third Term" },
-];
+import { useEffect, useState } from "react";
 
 type RankingPayload = {
   class: string;
@@ -30,38 +28,64 @@ export default function StudentDashboard() {
   const [ranking, setRanking] = useState<RankingPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [selectedTerm, setSelectedTerm] = useState("FirstTerm");
+  const [terms, setTerms] = useState<string[]>([]);
+  const [selectedTerm, setSelectedTerm] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedUser = loadUser();
-    if (!storedUser) {
-      setLoadingUser(false);
-      router.replace("/login");
-      return;
-    }
-    setUser(storedUser);
-    setLoadingUser(false);
+    const loadUserData = async () => {
+      const storedUser = loadUser();
+      if (!storedUser) {
+        setLoadingUser(false);
+        router.replace("/login");
+        return;
+      }
+      setUser(storedUser);
+      try {
+        const availableTerms = await getAvailableTerms(storedUser.class);
+        setTerms(availableTerms);
+        if (availableTerms.length > 0) {
+          setSelectedTerm(availableTerms[0]);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load sheet terms",
+        );
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    loadUserData();
   }, [router]);
 
-  const sheetName = useMemo(() => {
-    if (!user?.class) return null;
-    return `${user.class}-${selectedTerm}`;
-  }, [selectedTerm, user?.class]);
-
   useEffect(() => {
-    if (!user || !sheetName) return;
+    if (!user) return;
     const loadData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const [reportData, rankingData] = await Promise.all([
-          getStudentReport(user.id, sheetName),
-          getClassRanking(sheetName),
-        ]);
+        const reportData = await getStudentReportFromSheet(
+          user.id,
+          selectedTerm || undefined,
+        );
+        if (!reportData) {
+          setReport(null);
+          setRanking(null);
+          return;
+        }
+        const rankingData = await getClassRankingFromSheet(
+          reportData.class,
+          selectedTerm || reportData.term,
+        );
         setReport(reportData);
-        setRanking(rankingData);
+        setRanking({
+          class: reportData.class,
+          term: selectedTerm || reportData.term,
+          totalStudents: rankingData.length,
+          ranking: rankingData,
+        });
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load dashboard data",
@@ -72,7 +96,7 @@ export default function StudentDashboard() {
     };
 
     loadData();
-  }, [sheetName, user]);
+  }, [selectedTerm, user]);
 
   const handleLogout = () => {
     clearUser();
@@ -111,11 +135,15 @@ export default function StudentDashboard() {
             <select
               value={selectedTerm}
               onChange={(e) => setSelectedTerm(e.target.value)}
+              disabled={terms.length === 0}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
             >
-              {termOptions.map((term) => (
-                <option key={term.value} value={term.value}>
-                  {term.label}
+              {terms.length === 0 && (
+                <option value="">No term data</option>
+              )}
+              {terms.map((term) => (
+                <option key={term} value={term}>
+                  {term}
                 </option>
               ))}
             </select>

@@ -5,11 +5,11 @@ import { mockRanking } from "@/lib/mock-data";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const sheetName = searchParams.get("sheet");
+    const sheetName = searchParams.get("sheet") || process.env.DEFAULT_SHEET_NAME;
 
     if (!sheetName) {
       return NextResponse.json(
-        { error: "Sheet name is required (e.g., SS2A-FirstTerm)" },
+        { error: "Sheet name is required (e.g., SS2 Report Sheet)" },
         { status: 400 },
       );
     }

@@ -11,7 +11,7 @@ export async function GET(
     const { studentId: routeStudentId } = await params;
     const queryStudentId = searchParams.get("studentId");
     const studentId = routeStudentId || queryStudentId;
-    const sheetName = searchParams.get("sheet");
+    const sheetName = searchParams.get("sheet") || process.env.DEFAULT_SHEET_NAME;
 
     if (!studentId) {
       return NextResponse.json(
@@ -22,16 +22,14 @@ export async function GET(
 
     if (!sheetName) {
       return NextResponse.json(
-        { error: "Sheet name is required (e.g., SS2A-FirstTerm)" },
+        { error: "Sheet name is required (e.g., SS2 Report Sheet)" },
         { status: 400 },
       );
     }
 
     // Fetch results from Google Sheets
-    const useMocks = process.env.USE_MOCK_DATA === "true";
-    const studentReport = useMocks
-      ? mockReportById(studentId)
-      : await getStudentResults(studentId, sheetName);
+    // const useMocks = process.env.USE_MOCK_DATA === "true";
+    const studentReport = await getStudentResults(studentId, sheetName);
 
     if (!studentReport) {
       return NextResponse.json(

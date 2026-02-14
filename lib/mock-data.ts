@@ -8,7 +8,7 @@ export const mockUsers: User[] = [
   { id: "STU005", name: "David Brown", role: "student", class: "SS2A" },
 ];
 
-export const mockSheets = ["SS2A-FirstTerm", "SS2A-SecondTerm"];
+export const mockSheets = ["SS2 Report Sheet", "SS2A-FirstTerm", "SS2A-SecondTerm"];
 
 const baseSubjects = [
   "Mathematics",

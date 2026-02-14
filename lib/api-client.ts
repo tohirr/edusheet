@@ -17,7 +17,8 @@ export async function getStudentReport(studentId: string, sheetName: string) {
   if (!studentId) {
     throw new Error("Student ID is required");
   }
-  const response = await fetch(`/api/reports/${studentId}?sheet=${sheetName}`);
+  const query = sheetName ? `?sheet=${sheetName}` : "";
+  const response = await fetch(`/api/reports/${studentId}${query}`);
 
   if (!response.ok) {
     const error = await response.json();
@@ -28,7 +29,8 @@ export async function getStudentReport(studentId: string, sheetName: string) {
 }
 
 export async function getClassRanking(sheetName: string) {
-  const response = await fetch(`/api/ranking?sheet=${sheetName}`);
+  const query = sheetName ? `?sheet=${sheetName}` : "";
+  const response = await fetch(`/api/ranking${query}`);
 
   if (!response.ok) {
     const error = await response.json();
