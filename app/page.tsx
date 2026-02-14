@@ -2,65 +2,62 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 px-6">
-        <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight">
-          Welcome to <span className="text-blue-600">Scholarly</span>
-        </h1>
-        <p className="mt-4 text-lg text-gray-600 max-w-2xl">
-          The official digital report portal. Access your grades, view class
-          rankings, and track your academic performance in real-time.
-        </p>
-
-        <div className="mt-10 flex gap-4">
-          <Link
-            href="/login"
-            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition"
-          >
-            Student Login
-          </Link>
-          <Link
-            href="/ranking"
-            className="px-8 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition"
-          >
-            View Rankings
-          </Link>
-        </div>
-      </section>
-
-      {/* Feature Section */}
-      <section className="bg-gray-50 py-16 px-6">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center">
-          <div className="p-6">
-            <div className="text-3xl mb-4">📊</div>
-            <h3 className="font-bold text-xl mb-2">Live Reports</h3>
-            <p className="text-gray-600">
-              See your subject scores as soon as teachers upload them.
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        <header className="flex flex-col gap-6">
+          <p className="uppercase tracking-[0.3em] text-sm text-indigo-600 font-semibold">
+            Student Results Portal
+          </p>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+            Track academic performance, rankings, and term reports in one place.
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl">
+            ReportHub lets students log in with their school ID to view detailed
+            results while keeping the class leaderboard available to everyone.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/login"
+              className="px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors"
+            >
+              Student Login
+            </Link>
+            <Link
+              href="/ranking"
+              className="px-6 py-3 rounded-lg border border-indigo-200 text-indigo-700 font-semibold hover:bg-white transition-colors"
+            >
+              View Public Ranking
+            </Link>
           </div>
-          <div className="p-6">
-            <div className="text-3xl mb-4">🏆</div>
-            <h3 className="font-bold text-xl mb-2">Class Rankings</h3>
-            <p className="text-gray-600">
-              See where you stand among your peers and stay motivated.
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="text-3xl mb-4">📱</div>
-            <h3 className="font-bold text-xl mb-2">Mobile Ready</h3>
-            <p className="text-gray-600">
-              Check your results on the go from any smartphone or tablet.
-            </p>
-          </div>
-        </div>
-      </section>
+        </header>
 
-      {/* Footer */}
-      <footer className="py-10 text-center text-gray-400 text-sm">
-        © {new Date().getFullYear()} Scholarly Portal • Built for School
-        Excellence
-      </footer>
+        <section className="mt-16 grid md:grid-cols-3 gap-6">
+          {[
+            {
+              title: "Private Results",
+              body: "Access subject scores, averages, and term totals with confidence that your data stays private.",
+            },
+            {
+              title: "Public Leaderboard",
+              body: "Celebrate top performers with a clear class ranking view available to all students.",
+            },
+            {
+              title: "Google Sheets Ready",
+              body: "Teachers update results in Google Sheets while the portal syncs them instantly.",
+            },
+          ].map((feature) => (
+            <div
+              key={feature.title}
+              className="bg-white rounded-xl shadow-sm p-6 border border-white/60"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 mt-2">{feature.body}</p>
+            </div>
+          ))}
+        </section>
+      </div>
     </div>
   );
 }
